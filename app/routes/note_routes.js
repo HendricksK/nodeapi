@@ -4,9 +4,10 @@ var ObjectID = require('mongodb').ObjectID;
 
 module.exports = function(app, db) {
 
+	//GET
 	app.get('/notes/:id', (req,res) => {
 	
-		var id = '5ac28363a7b62c21fc6122e6';
+		var id = req.params.id;
 		var details = { '_id': new ObjectID(id) };	
 
 	    db.collection('notes').find(details).toArray( (err, result) => {
@@ -18,6 +19,7 @@ module.exports = function(app, db) {
 		});
 	});
 
+	//POST
 	app.post('/notes', (req,res) => {
 
 		var note = { text: req.body.body, title: req.body.title };
@@ -30,4 +32,37 @@ module.exports = function(app, db) {
 	      	}
 	    });
 	})
+
+	//DELETE
+	app.delete('/notes/:id', (req, res) => {
+
+    	var id = req.params.id;
+    	var details = { '_id': new ObjectID(id) };
+
+	    db.collection('notes').remove(details, (err, item) => {
+	      	if (err) {
+	        	res.send({'error':'An error has occurred'});
+	      	} else {
+	        	res.send('Note ' + id + ' deleted!');
+	      	} 
+    	});
+  	});
+
+	//PUT also known as UPDATE
+  	app.put('/notes/:id', (req, res) => {
+
+    	var id = req.params.id;
+    	var details = { '_id': new ObjectID(id) };
+    	var note = { text: req.body.body, title: req.body.title };
+		    
+		db.collection('notes').update(details, note, (err, result) => {
+		    if (err) {
+		        res.send({'error':'An error has occurred'});
+		    } else {
+		        res.send(note);
+		    } 
+		});
+  });
+
+
 };
